@@ -1,51 +1,73 @@
 import { ProfileUI } from '@ui-pages';
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { FC, SyntheticEvent, useEffect, useState, useMemo } from 'react';
+import { useSelector, useDispatch } from '../../services/store';
+import {
+  getUser,
+  getUserState,
+  updateUser
+} from '../../services/slices/userSlice';
+import { Preloader } from '@ui';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
-  const user = {
-    name: '',
-    email: ''
-  };
+  const { userData, request: loading } = useSelector(getUserState);
+  const dispatch = useDispatch();
+
+  const initialUser = useMemo(
+    () => ({
+      name: userData?.name || '',
+      email: userData?.email || ''
+    }),
+    [userData]
+  );
 
   const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+    name: initialUser.name,
+    email: initialUser.email,
     password: ''
   });
 
   useEffect(() => {
     setFormValue((prevState) => ({
       ...prevState,
-      name: user?.name || '',
-      email: user?.email || ''
+      name: initialUser.name,
+      email: initialUser.email
     }));
-  }, [user]);
+  }, [initialUser]);
 
-  const isFormChanged =
-    formValue.name !== user?.name ||
-    formValue.email !== user?.email ||
-    !!formValue.password;
+  const isFormChanged = useMemo(
+    () =>
+      formValue.name !== initialUser.name ||
+      formValue.email !== initialUser.email ||
+      !!formValue.password,
+    [formValue, initialUser]
+  );
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    dispatch(updateUser(formValue));
+    dispatch(getUser());
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
     setFormValue({
-      name: user.name,
-      email: user.email,
+      name: initialUser.name,
+      email: initialUser.email,
       password: ''
     });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormValue((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
   };
+
+  if (loading) {
+    return <Preloader />;
+  }
 
   return (
     <ProfileUI
@@ -56,6 +78,4 @@ export const Profile: FC = () => {
       handleInputChange={handleInputChange}
     />
   );
-
-  return null;
 };

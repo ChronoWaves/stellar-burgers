@@ -10,6 +10,33 @@ import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorElement, Modal } from '@components';
 import { Preloader, OrderDetailsUI } from '@ui';
 
+const BunSection = ({
+  bun,
+  position
+}: {
+  bun: TConstructorIngredient | null;
+  position: string;
+}) =>
+  bun ? (
+    <div
+      className={`${styles.element} ${position === 'top' ? 'mb-4' : 'mt-4'} mr-4`}
+    >
+      <ConstructorElement
+        type={position === 'top' ? 'top' : 'bottom'}
+        isLocked
+        text={`${bun.name} (${position === 'top' ? 'верх' : 'низ'})`}
+        price={bun.price}
+        thumbnail={bun.image}
+      />
+    </div>
+  ) : (
+    <div
+      className={`${styles.noBuns} ${position === 'top' ? styles.noBunsTop : styles.noBunsBottom} ml-8 mb-4 mr-5 text text_type_main-default`}
+    >
+      Выберите булки
+    </div>
+  );
+
 export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
   constructorItems,
   orderRequest,
@@ -19,23 +46,7 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
   closeOrderModal
 }) => (
   <section className={styles.burger_constructor}>
-    {constructorItems.bun ? (
-      <div className={`${styles.element} mb-4 mr-4`}>
-        <ConstructorElement
-          type='top'
-          isLocked
-          text={`${constructorItems.bun.name} (верх)`}
-          price={constructorItems.bun.price}
-          thumbnail={constructorItems.bun.image}
-        />
-      </div>
-    ) : (
-      <div
-        className={`${styles.noBuns} ${styles.noBunsTop} ml-8 mb-4 mr-5 text text_type_main-default`}
-      >
-        Выберите булки
-      </div>
-    )}
+    <BunSection bun={constructorItems.bun} position='top' />
     <ul className={styles.elements}>
       {constructorItems.ingredients.length > 0 ? (
         constructorItems.ingredients.map(
@@ -56,23 +67,7 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
         </div>
       )}
     </ul>
-    {constructorItems.bun ? (
-      <div className={`${styles.element} mt-4 mr-4`}>
-        <ConstructorElement
-          type='bottom'
-          isLocked
-          text={`${constructorItems.bun.name} (низ)`}
-          price={constructorItems.bun.price}
-          thumbnail={constructorItems.bun.image}
-        />
-      </div>
-    ) : (
-      <div
-        className={`${styles.noBuns} ${styles.noBunsBottom} ml-8 mb-4 mr-5 text text_type_main-default`}
-      >
-        Выберите булки
-      </div>
-    )}
+    <BunSection bun={constructorItems.bun} position='bottom' />
     <div className={`${styles.total} mt-10 mr-4`}>
       <div className={`${styles.cost} mr-10`}>
         <p className={`text ${styles.text} mr-2`}>{price}</p>
@@ -82,17 +77,17 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
         htmlType='button'
         type='primary'
         size='large'
-        children='Оформить заказ'
         onClick={onOrderClick}
-      />
+        data-cy='order-button'
+      >
+        Оформить заказ
+      </Button>
     </div>
-
     {orderRequest && (
       <Modal onClose={closeOrderModal} title={'Оформляем заказ...'}>
         <Preloader />
       </Modal>
     )}
-
     {orderModalData && (
       <Modal
         onClose={closeOrderModal}

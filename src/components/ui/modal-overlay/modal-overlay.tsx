@@ -1,5 +1,10 @@
+import React from 'react';
 import styles from './modal-overlay.module.css';
 
-export const ModalOverlayUI = ({ onClick }: { onClick: () => void }) => (
-  <div className={styles.overlay} onClick={onClick} />
+interface ModalOverlayUIProps {
+  onClick: () => void;
+}
+
+export const ModalOverlayUI: React.FC<ModalOverlayUIProps> = ({ onClick }) => (
+  <div data-cy='overlay' className={styles.overlay} onClick={onClick} />
 );
