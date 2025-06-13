@@ -1,7 +1,7 @@
+import { useDispatch } from '../../services/store';
 import { FC, memo, useCallback } from 'react';
 import { BurgerConstructorElementUI } from '@ui';
 import { BurgerConstructorElementProps } from './type';
-import { useDispatch } from 'react-redux';
 import {
   removeIngredient,
   moveIngredientUp,
